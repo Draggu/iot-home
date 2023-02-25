@@ -1,0 +1,13 @@
+diff --git ./src/lib.rs ./src/lib.rs
+index 8423566..f0dbecf 100644
+--- ./src/lib.rs
++++ ./src/lib.rs
+@@ -38,7 +38,7 @@ pub use link::meters;
+ pub use router::{
+     Alert, AlertError, AlertEvent, GetMeter, IncomingMeter, Meter, Notification, OutgoingMeter,
+ };
+-pub use server::Broker;
++pub use server::{Broker, Server, LinkType};
+ 
+ #[derive(Debug, Default, Serialize, Deserialize, Clone)]
+ pub struct Config {

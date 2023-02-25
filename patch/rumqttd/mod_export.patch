@@ -1,0 +1,13 @@
+diff --git ./src/server/mod.rs ./src/server/mod.rs
+index c099396..2de12d2 100644
+--- ./src/server/mod.rs
++++ ./src/server/mod.rs
+@@ -4,7 +4,7 @@ mod broker;
+ #[cfg(any(feature = "use-rustls", feature = "use-native-tls"))]
+ mod tls;
+ 
+-pub use broker::Broker;
++pub use broker::{Broker, Server, LinkType};
+ 
+ pub trait IO: AsyncRead + AsyncWrite + Send + Sync + Unpin {}
+ impl<T: AsyncRead + AsyncWrite + Send + Sync + Unpin> IO for T {}

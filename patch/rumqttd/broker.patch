@@ -1,0 +1,31 @@
+diff --git ./src/server/broker.rs ./src/server/broker.rs
+index f9d3869..9675f43 100644
+--- ./src/server/broker.rs
++++ ./src/server/broker.rs
+@@ -55,7 +55,7 @@ pub enum Error {
+ 
+ pub struct Broker {
+     config: Arc<Config>,
+-    router_tx: Sender<(ConnectionId, Event)>,
++    pub router_tx: Sender<(ConnectionId, Event)>,
+ }
+ 
+ impl Broker {
+@@ -308,7 +308,7 @@ pub enum LinkType {
+     Remote,
+ }
+ 
+-struct Server<P> {
++pub struct Server<P> {
+     config: ServerSettings,
+     router_tx: Sender<(ConnectionId, Event)>,
+     protocol: P,
+@@ -341,7 +341,7 @@ impl<P: Protocol + Clone + Send + 'static> Server<P> {
+         Ok((Box::new(stream), None))
+     }
+ 
+-    async fn start(&self, link_type: LinkType) -> Result<(), Error> {
++    pub async fn start(&self, link_type: LinkType) -> Result<(), Error> {
+         let listener = TcpListener::bind(&self.config.listen).await?;
+         let delay = Duration::from_millis(self.config.next_connection_delay_ms);
+         let mut count: usize = 0;
