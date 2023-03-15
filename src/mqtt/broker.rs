@@ -3,8 +3,6 @@ use rumqttd::{
 };
 use std::net::SocketAddr;
 
-//TODO add support for internal handling spawn and abort
-
 /// this works on patched version of rumqttd
 /// patch allows using broker in current runtime
 /// more details can be found in [patch/rumqttd]

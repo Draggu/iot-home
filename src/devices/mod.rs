@@ -1,3 +1,3 @@
-pub mod light;
-pub mod shutter;
-pub mod switch;
+pub mod kinds;
+pub mod registry;
+pub mod specials;

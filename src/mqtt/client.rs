@@ -11,6 +11,7 @@ pub struct MqttMessage {
     pub topic: String,
 }
 
+#[derive(Debug)]
 pub struct MqttError;
 
 impl From<MqttError> for &str {
@@ -25,6 +26,7 @@ impl From<ClientError> for MqttError {
     }
 }
 
+#[derive(Clone)]
 /// very simple PubSub usig mqtt
 pub struct MqttClient {
     client: AsyncClient,
@@ -47,9 +49,9 @@ impl MqttClient {
                 if let Ok(Event::Incoming(Packet::Publish(Publish { topic, payload, .. }))) =
                     eventloop.poll().await
                 {
-                    let payload = String::from_utf8_lossy(&*payload).into_owned();
-
                     if let Some(tx) = txs.lock().await.get(&topic) {
+                        let payload = String::from_utf8_lossy(&*payload).into_owned();
+
                         // error -> no receiver -> no subscriber -> just omit
                         tx.send(MqttMessage { topic, payload }).ok();
                     }
