@@ -6,7 +6,7 @@ use crate::{
     db::DbErrWrapper, devices::registry::service::DeviceService, mqtt::client::MqttClient,
 };
 use futures::{FutureExt, StreamExt};
-use sea_orm::{entity::*, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{entity::*, sea_query::Expr, DatabaseConnection, EntityTrait, QueryFilter};
 use stream_cancel::{StreamExt as Cancel, Tripwire};
 
 pub struct VoltageService {
@@ -50,11 +50,14 @@ impl VoltageService {
     pub async fn get_last_day<'a>(&self, device_name: String) -> Result<Vec<Sensor>, DbErrWrapper> {
         let results = Entity::find()
             .filter(Column::DeviceName.eq(device_name))
-            .filter(Column::Timestamp.gte("DATE('now','-1 day')"))
+            .filter(Expr::col(Column::Timestamp).gte(Expr::cust("DATE('now','-1 day')")))
             .all(&self.db)
-            .await?;
+            .await?
+            .into_iter()
+            .map(Into::into)
+            .collect();
 
-        Ok(results.into_iter().map(Into::into).collect())
+        Ok(results)
     }
 
     async fn setup_and_start_recording(

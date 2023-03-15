@@ -15,7 +15,8 @@ impl From<DbErr> for DbErrWrapper {
 }
 
 impl From<DbErrWrapper> for &str {
-    fn from(_: DbErrWrapper) -> &'static str {
+    fn from(e: DbErrWrapper) -> &'static str {
+        println!("{:?}", e.0);
         "db error ocured"
     }
 }

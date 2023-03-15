@@ -1,16 +1,16 @@
 use async_graphql::SimpleObject;
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
-use time::Date;
+use time::{serde::iso8601, OffsetDateTime};
 
 #[derive(Serialize, Deserialize, Clone, Debug, DeriveEntityModel)]
 #[sea_orm(table_name = "voltage")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    id: u64,
+    id: u32,
     device_name: String,
     voltage: u16,
-    timestamp: Date,
+    timestamp: OffsetDateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -20,8 +20,8 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Deserialize)]
 pub struct SensorMqtt {
-    #[serde(rename = "Time")]
-    time: Date,
+    #[serde(rename = "Time", with = "iso8601")]
+    time: OffsetDateTime,
 
     #[serde(rename = "ENERGY")]
     energy: SensorMqttEnergy,
@@ -36,7 +36,7 @@ pub struct SensorMqttEnergy {
 #[derive(Serialize, SimpleObject)]
 #[graphql(name = "VoltageReportUnit")]
 pub struct Sensor {
-    pub timestamp: Date,
+    pub timestamp: OffsetDateTime,
     pub voltage: u16,
 }
 
