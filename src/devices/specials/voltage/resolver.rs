@@ -15,11 +15,10 @@ impl VoltageQuery {
         context: &Context<'_>,
         device_name: String,
     ) -> Result<Vec<Sensor>, &str> {
-        context
+        Ok(context
             .data_unchecked::<VoltageService>()
             .get_last_day(device_name)
-            .await
-            .map_err(Into::into)
+            .await?)
     }
 }
 

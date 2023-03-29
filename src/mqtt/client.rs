@@ -22,7 +22,7 @@ impl From<MqttError> for &str {
 
 impl From<ClientError> for MqttError {
     fn from(_: ClientError) -> Self {
-        Self {}
+        Self
     }
 }
 

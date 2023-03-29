@@ -8,9 +8,9 @@ use futures::Stream;
 use uuid::Uuid;
 
 #[derive(Default)]
-pub struct DeviceLightMutation {}
+pub struct DeviceLightMutation;
 #[derive(Default)]
-pub struct DeviceLightSubscription {}
+pub struct DeviceLightSubscription;
 
 #[Object]
 impl DeviceLightMutation {

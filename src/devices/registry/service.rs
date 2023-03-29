@@ -9,33 +9,20 @@ use tokio::sync::broadcast::{self, Sender};
 use tokio_stream::wrappers::BroadcastStream;
 use uuid::Uuid;
 
-pub struct DeviceNotFound;
-
-impl From<DeviceNotFound> for &str {
-    fn from(_: DeviceNotFound) -> &'static str {
-        "there is no such a name registered"
-    }
-}
-
 pub enum DeviceErr {
-    NotFound(DeviceNotFound),
+    NotFound,
     DbErr(DbErrWrapper),
 }
 
 impl From<DeviceErr> for &str {
     fn from(device_err: DeviceErr) -> &'static str {
         match device_err {
-            DeviceErr::NotFound(err) => err.into(),
+            DeviceErr::NotFound => "there is no such a name registered",
             DeviceErr::DbErr(err) => err.into(),
         }
     }
 }
 
-impl From<DeviceNotFound> for DeviceErr {
-    fn from(err: DeviceNotFound) -> DeviceErr {
-        DeviceErr::NotFound(err)
-    }
-}
 impl From<DbErr> for DeviceErr {
     fn from(err: DbErr) -> DeviceErr {
         DeviceErr::DbErr(DbErrWrapper::new(err))
@@ -77,7 +64,7 @@ impl DeviceService {
         DeviceEntity::find_by_id(id)
             .one(&self.db)
             .await?
-            .ok_or(DeviceErr::NotFound(DeviceNotFound))
+            .ok_or(DeviceErr::NotFound)
     }
 
     #[inline]
@@ -92,7 +79,7 @@ impl DeviceService {
     }
 
     #[inline]
-    pub async fn add<'a>(&self, device: DeviceModel) -> Result<DeviceModel, DbErrWrapper> {
+    pub async fn add(&self, device: DeviceModel) -> Result<DeviceModel, DbErrWrapper> {
         let result = DeviceEntity::insert(ActiveDeviceModel {
             id: Set(Uuid::new_v4()),
             channel: Set(device.channel),
@@ -114,7 +101,7 @@ impl DeviceService {
         let r = DeviceEntity::delete_by_id(id).exec(&self.db).await?;
 
         if r.rows_affected == 0 {
-            Err(DeviceErr::NotFound(DeviceNotFound))
+            Err(DeviceErr::NotFound)
         } else {
             self.on_change_notify();
 

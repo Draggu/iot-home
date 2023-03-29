@@ -3,7 +3,7 @@ use crate::{listen_command, mqtt::client::MqttMessage, send_command};
 fn map(message: MqttMessage, channel: &str) -> Option<bool> {
     let serde_value = serde_json::Value::from(message.payload)
         .as_object_mut()
-        .and_then(move |map| map.remove(&format!("POWER{channel}")))?;
+        .and_then(|map| map.remove(&format!("POWER{channel}")))?;
 
     let value = serde_value.as_str()?;
 

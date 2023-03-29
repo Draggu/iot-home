@@ -7,6 +7,7 @@ use gql::{graphql_handler, Mutation, Query, Subscription};
 use sea_orm::Database;
 use sea_orm_migration::MigratorTrait;
 use std::env;
+use tower_http::cors::CorsLayer;
 
 mod db;
 mod devices;
@@ -62,6 +63,7 @@ async fn main() {
             GraphQLSubscription::new(schema.clone()),
         )
         .layer(Extension(schema))
+        .layer(CorsLayer::very_permissive())
         .into_make_service();
 
     let _server = Server::bind(

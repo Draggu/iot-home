@@ -11,11 +11,7 @@ pub struct DevicesMutation;
 #[Object]
 impl DevicesQuery {
     async fn all_devices(&self, context: &Context<'_>) -> Result<Vec<DeviceModel>, &str> {
-        context
-            .data_unchecked::<DeviceService>()
-            .to_gql()
-            .await
-            .map_err(Into::into)
+        Ok(context.data_unchecked::<DeviceService>().to_gql().await?)
     }
 }
 
@@ -26,19 +22,17 @@ impl DevicesMutation {
         context: &Context<'_>,
         device: DeviceModel,
     ) -> Result<DeviceModel, &str> {
-        context
+        Ok(context
             .data_unchecked::<DeviceService>()
             .add(device)
-            .await
-            .map_err(Into::into)
+            .await?)
     }
 
     async fn remove_device(&self, context: &Context<'_>, display_name: Uuid) -> Result<Void, &str> {
-        context
+        Ok(context
             .data_unchecked::<DeviceService>()
             .remove(display_name)
-            .await
-            .map_err(Into::into)
-            .map(Into::into)
+            .await?
+            .into())
     }
 }

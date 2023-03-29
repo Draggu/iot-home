@@ -5,7 +5,7 @@ fn map(message: MqttMessage, channel: &str) -> Option<ShutterStatus> {
     let value = serde_json::from_str::<serde_json::Value>(&message.payload)
         .ok()?
         .as_object_mut()
-        .and_then(move |map| map.remove(&format!("Shutter{channel}")))?;
+        .and_then(|map| map.remove(&format!("Shutter{channel}")))?;
 
     serde_json::from_value(value).ok()
 }
