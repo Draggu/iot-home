@@ -33,7 +33,7 @@ pub async fn create(host: String, port: u16) {
         },
         listen: SocketAddr::new(host.parse().unwrap(), port),
         name: "v4".to_owned(),
-        next_connection_delay_ms: 1,
+        next_connection_delay_ms: 0,
         tls: None,
     };
 

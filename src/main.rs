@@ -8,6 +8,8 @@ use sea_orm::Database;
 use sea_orm_migration::MigratorTrait;
 use std::env;
 use tower_http::cors::CorsLayer;
+use tracing::subscriber;
+use tracing_subscriber::FmtSubscriber;
 
 mod db;
 mod devices;
@@ -18,6 +20,8 @@ mod mqtt;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
+
+    subscriber::set_global_default(FmtSubscriber::new()).expect("setting tracing default failed");
 
     let db = Database::connect("sqlite://db.sqlite?mode=rwc")
         .await
