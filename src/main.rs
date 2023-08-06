@@ -41,9 +41,12 @@ async fn main() {
         })
         .unwrap_or(1883);
 
-    tokio::spawn(mqtt::broker::create(mqtt_hostname.clone(), mqtt_port));
+    tokio::spawn(mqtt::broker::create(
+        mqtt_hostname.parse().unwrap(),
+        mqtt_port,
+    ));
 
-    let mqtt = mqtt::client::MqttClient::new(mqtt_hostname, mqtt_port);
+    let mqtt = mqtt::client::MqttClient::new(&mqtt_hostname, mqtt_port);
 
     let devices = DeviceService::new(db.clone());
 

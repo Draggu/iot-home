@@ -1,9 +1,11 @@
 use futures::lock::Mutex;
 use futures::{Stream, StreamExt};
 use rumqttc::{AsyncClient, ClientError, Event, MqttOptions, Packet, Publish, QoS};
+use std::fmt::Debug;
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::broadcast::{self, Sender};
 use tokio_stream::wrappers::BroadcastStream;
+use tracing::{event, Level};
 
 #[derive(Clone, Debug)]
 pub struct MqttMessage {
@@ -37,7 +39,7 @@ pub struct MqttClient {
 }
 
 impl MqttClient {
-    pub fn new(adress: String, port: u16) -> Self {
+    pub fn new(adress: &str, port: u16) -> Self {
         let (client, mut eventloop) =
             AsyncClient::new(MqttOptions::new("orchestrator", adress, port), 500);
 
@@ -46,14 +48,18 @@ impl MqttClient {
 
         tokio::spawn(async move {
             loop {
-                if let Ok(Event::Incoming(Packet::Publish(Publish { topic, payload, .. }))) =
-                    eventloop.poll().await
-                {
-                    if let Some(tx) = txs.lock().await.get(&topic) {
-                        let payload = String::from_utf8_lossy(&*payload).into_owned();
+                if let Ok(event) = eventloop.poll().await {
+                    let message = format!("{:?}", event);
+                    event!(Level::INFO, message);
 
-                        // error -> no receiver -> no subscriber -> just omit
-                        tx.send(MqttMessage { topic, payload }).ok();
+                    if let Event::Incoming(Packet::Publish(Publish { topic, payload, .. })) = event
+                    {
+                        if let Some(tx) = txs.lock().await.get(&topic) {
+                            let payload = String::from_utf8_lossy(&*payload).into_owned();
+
+                            // error -> no receiver -> no subscriber -> just omit
+                            tx.send(MqttMessage { topic, payload }).ok();
+                        }
                     }
                 }
             }
